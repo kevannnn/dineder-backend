@@ -8,7 +8,7 @@ import (
 	"github.com/CVWO/sample-go-app/internal/router"
 )
 
-//gh;ekfofwd
+//gh;ekfofwds
 
 func main() {
 	r := router.Setup()
