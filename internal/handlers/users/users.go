@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/CVWO/sample-go-app/internal/api"
-	users "github.com/CVWO/sample-go-app/internal/dataaccess"
-	"github.com/CVWO/sample-go-app/internal/database"
+	
+	"github.com/go-chi/chi"
+	"github.com/kevannnn/dineder-backend/internal/api"
+	users "github.com/kevannnn/dineder-backend/internal/dataaccess"
+	"github.com/kevannnn/dineder-backend/internal/database"
 	"github.com/pkg/errors"
 )
 
@@ -43,4 +44,15 @@ func HandleList(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
 		},
 		Messages: []string{SuccessfulListUsersMessage},
 	}, nil
+}
+
+func PostUser(w http.ResponseWriter, req *http.Request) {
+
+	var newUser models.User
+	json.NewDecoder(req.Body).Decode(newUser)
+
+	//err := dataaccess.CreateUser(database.DB, newUser)
+	//response, _ := utils.HandlerFormatter(err, newUser, "PostUser", constants.SuccessfulPostMessage)
+	response := newUser.id
+	json.NewEncoder(w).Encode(response)
 }

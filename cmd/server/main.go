@@ -5,10 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/CVWO/sample-go-app/internal/router"
+	"github.com/kevannnn/dineder-backend/internal/router"
 )
-
-//gh;ekfofwdsd
 
 func main() {
 	r := router.Setup()
