@@ -6,3 +6,7 @@
 # Editor
 .idea/*
 .vscode/*
+
+#mods
+go.mod
+go.sum
