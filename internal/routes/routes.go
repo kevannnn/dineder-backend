@@ -7,7 +7,7 @@ import (
 
 func GetRoutes() func(r chi.Router) {
 	return func(r chi.Router) {
-		//r.Get("/user/{username}/{password}", handlers.GetUser)
+		r.Get("/user/{username}/{password}", handlers.GetUserID)
 		r.Post("/user", handlers.PostUser)
 	}
 }

@@ -2,24 +2,36 @@ package handlers
 
 import (
 	"encoding/json"
-	"net/http"
 	"fmt"
+	"net/http"
 
-	//"github.com/go-chi/chi"
+	"github.com/go-chi/chi"
+	"github.com/kevannnn/dineder-backend/internal/api"
+	"github.com/kevannnn/dineder-backend/internal/dataaccess"
 	"github.com/kevannnn/dineder-backend/internal/database"
 	"github.com/kevannnn/dineder-backend/internal/models"
-	//"github.com/kevannnn/dineder-backend/internal/dataaccess"
-	"github.com/kevannnn/dineder-backend/internal/api"
-	"gorm.io/gorm"
-	
 )
 
-func CreateUser(db *gorm.DB, newUser models.User) error {
-	result := db.Table("dineder_user2").Create(&newUser)
-	if result.Error != nil {
-		fmt.Println("Error creating user:", result.Error)
-	}
-	return result.Error
+func GetUserID(w http.ResponseWriter, req *http.Request) {
+    username := chi.URLParam(req, "username")
+	password := chi.URLParam(req, "password")
+	
+	user, err := dataaccess.ReadUserID(database.DB, username, password)
+    if err != nil {
+        http.Error(w, "Failed to retrieve user ID", http.StatusInternalServerError)
+        return
+    }
+
+	response := api.Response{
+        Data: json.RawMessage(fmt.Sprintf(`{"id": "%s"}`, user.ID.String())),
+    }
+   
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+        http.Error(w, "failed to encode response", http.StatusInternalServerError)
+        return
+    }
+
+
 }
 
 func PostUser(w http.ResponseWriter, req *http.Request) {
@@ -30,16 +42,15 @@ func PostUser(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = CreateUser(database.DB, newUser)
+	err = dataaccess.CreateUser(database.DB, newUser)
 	if err != nil {
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
 		return
 	}
 
-	//error: id always returns 0 
 	response := api.Response{
-		Data: json.RawMessage(fmt.Sprintf(`{"id": %d, "username": "%s" }`, newUser.ID, newUser.Username)),
-	}
+		Data: json.RawMessage(fmt.Sprintf(`{"message": "Welcome to dineder, %s"}`, newUser.Username)),
+	}	
 
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
