@@ -16,9 +16,9 @@ func CreateUser(db *gorm.DB, newUser models.User) error {
 	return result.Error
 }
 
-func ReadUserID(db *gorm.DB, username string, password string) (models.User, error) {
+func ReadUserID(db *gorm.DB, email string, password string) (models.User, error) {
 	var user models.User
-	result := db.Where(&models.User{Username: username, Password: password}).First(&user)
+	result := db.Where(&models.User{Email: email, Password: password}).First(&user)
 	if result.Error != nil {
         if result.Error == gorm.ErrRecordNotFound {
             return user, errors.New("user not found")

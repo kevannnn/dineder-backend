@@ -13,10 +13,10 @@ import (
 )
 
 func GetUserID(w http.ResponseWriter, req *http.Request) {
-    username := chi.URLParam(req, "username")
+    email := chi.URLParam(req, "email")
 	password := chi.URLParam(req, "password")
 	
-	user, err := dataaccess.ReadUserID(database.DB, username, password)
+	user, err := dataaccess.ReadUserID(database.DB, email, password)
     if err != nil {
         http.Error(w, "Failed to retrieve user ID", http.StatusInternalServerError)
         return
