@@ -30,8 +30,6 @@ func GetUserID(w http.ResponseWriter, req *http.Request) {
         http.Error(w, "failed to encode response", http.StatusInternalServerError)
         return
     }
-
-
 }
 
 func PostUser(w http.ResponseWriter, req *http.Request) {
@@ -42,14 +40,133 @@ func PostUser(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = dataaccess.CreateUser(database.DB, newUser)
+	newUser, err = dataaccess.CreateUser(database.DB, newUser)
 	if err != nil {
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
 		return
 	}
 
 	response := api.Response{
-		Data: json.RawMessage(fmt.Sprintf(`{"message": "Welcome to dineder, %s"}`, newUser.Username)),
+		Data: json.RawMessage(fmt.Sprintf(`{
+			"message": "Welcome to dineder, %s",
+			"user_id": "%s"
+			}`, newUser.Name, newUser.ID)),
+	}	
+
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
+}
+
+func UpdateUserGender(w http.ResponseWriter, req *http.Request) {
+	UserID := chi.URLParam(req, "id")
+	var requestBody struct {
+		Gender int `json:"gender"`
+	}
+	
+	err := json.NewDecoder(req.Body).Decode(&requestBody) 
+	if err != nil {
+		http.Error(w, "Failed to decode request body", http.StatusBadRequest)
+		return
+	}
+	
+	updatedUser, err := dataaccess.UpdateUserField(database.DB, UserID, "Gender", requestBody.Gender)
+	if err != nil {
+		http.Error(w, "Failed to update user gender", http.StatusInternalServerError)
+		return
+	}
+
+	response := api.Response{
+		Data: json.RawMessage(
+			fmt.Sprintf(`{"message": "Updated gender for %s as %d"}`, updatedUser.Name, updatedUser.Gender)),
+	}	
+
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
+}
+
+func UpdateUserPrefGender(w http.ResponseWriter, req *http.Request) {
+	UserID := chi.URLParam(req, "id")
+	var requestBody struct {
+		PrefGender 	int `json:"pref_gender"`
+	}
+	
+	err := json.NewDecoder(req.Body).Decode(&requestBody) 
+	if err != nil {
+		http.Error(w, "Failed to decode request body", http.StatusBadRequest)
+		return
+	}
+	
+	updatedUser, err := dataaccess.UpdateUserField(database.DB, UserID, "PrefGender", requestBody.PrefGender)
+	if err != nil {
+		http.Error(w, "Failed to update user preferred gender", http.StatusInternalServerError)
+		return
+	}
+
+	response := api.Response{
+		Data: json.RawMessage(
+			fmt.Sprintf(`{"message": "Updated preferred gender for %s as %d"}`, updatedUser.Name, updatedUser.PrefGender)),
+	}	
+
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
+}
+
+func UpdateUserFaculty(w http.ResponseWriter, req *http.Request) {
+	UserID := chi.URLParam(req, "id")
+	var requestBody struct {
+		Faculty	int  `json:"faculty"`
+	}
+	
+	err := json.NewDecoder(req.Body).Decode(&requestBody) 
+	if err != nil {
+		http.Error(w, "Failed to decode request body", http.StatusBadRequest)
+		return
+	}
+	
+	updatedUser, err := dataaccess.UpdateUserField(database.DB, UserID, "Faculty", requestBody.Faculty)
+	if err != nil {
+		http.Error(w, "Failed to update user faculty", http.StatusInternalServerError)
+		return
+	}
+
+	response := api.Response{
+		Data: json.RawMessage(
+			fmt.Sprintf(`{"message": "Updated faculty for %s as %d"}`, updatedUser.Name, updatedUser.Faculty)),
+	}	
+
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
+}
+
+func UpdateUserMealPref(w http.ResponseWriter, req *http.Request) {
+	UserID := chi.URLParam(req, "id")
+	var requestBody struct {
+		MealPref  int  `json:"meal_pref"`
+	}
+	
+	err := json.NewDecoder(req.Body).Decode(&requestBody) 
+	if err != nil {
+		http.Error(w, "Failed to decode request body", http.StatusBadRequest)
+		return
+	}
+	
+	updatedUser, err := dataaccess.UpdateUserField(database.DB, UserID, "MealPref", requestBody.MealPref)
+	if err != nil {
+		http.Error(w, "Failed to update user meal preference", http.StatusInternalServerError)
+		return
+	}
+
+	response := api.Response{
+		Data: json.RawMessage(
+			fmt.Sprintf(`{"message": "Updated meal preference for %s as %d"}`, updatedUser.Name, updatedUser.MealPref)),
 	}	
 
 	err = json.NewEncoder(w).Encode(response)
