@@ -14,39 +14,58 @@ import (
 
 func PostDinederSlot(w http.ResponseWriter, req *http.Request) {
 	var newDS models.DinederSlot
+	var existingDS models.DinederSlot
 	err := json.NewDecoder(req.Body).Decode(&newDS)
 	if err != nil {
 		http.Error(w, "Failed to decode request body", http.StatusBadRequest)
 		return
 	}
 
-	err = dataaccess.CreateDS(database.DB, newDS)
-	if err != nil {
-		http.Error(w, "Failed to create dineder slot", http.StatusInternalServerError)
-		return
-	}
+	existingDS = dataaccess.GetExistingDS(database.DB, newDS.TimeslotID, newDS.UserID)
+	if existingDS.ID != 0 {
+		DSExistResponse := api.Response{
+			Data: json.RawMessage(
+				fmt.Sprintf(`{
+					"message": " There is an exisiting dineder slot made by %s",
+					"tsid": "%d"
+					}`, existingDS.UserID, existingDS.ID),
+				),
+		}	
+		err = json.NewEncoder(w).Encode(DSExistResponse)
+		if err != nil {
+			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		}
 
-	userName, err := dataaccess.GetUserNameFromID(database.DB, newDS.UserID)
-	if err != nil {
-		http.Error(w, "Failed to fetch user's name", http.StatusInternalServerError)
-		return
-	}
+	} else {
 
-	timeslotTime, err := dataaccess.GetTSTimeFromID(database.DB, newDS.TimeslotID)
-	if err != nil {
-		http.Error(w, "Failed to fetch user's name", http.StatusInternalServerError)
-		return
-	}
+		err = dataaccess.CreateDS(database.DB, newDS)
+		if err != nil {
+			http.Error(w, "Failed to create dineder slot", http.StatusInternalServerError)
+			return
+		}
 
-	response := api.Response{
-		Data: json.RawMessage(
-			fmt.Sprintf(`{"message": "Dineder slot created at %s by %s"}`, timeslotTime, userName),
-			),
-	}	
+		userName, err := dataaccess.GetUserNameFromID(database.DB, newDS.UserID)
+		if err != nil {
+			http.Error(w, "Failed to fetch user's name", http.StatusInternalServerError)
+			return
+		}
 
-	err = json.NewEncoder(w).Encode(response)
-	if err != nil {
-		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		timeslotTime, err := dataaccess.GetTSTimeFromID(database.DB, newDS.TimeslotID)
+		if err != nil {
+			http.Error(w, "Failed to fetch user's name", http.StatusInternalServerError)
+			return
+		}
+
+		response := api.Response{
+			Data: json.RawMessage(
+				fmt.Sprintf(`{"message": "Dineder slot created at %s by %s"}`, timeslotTime, userName),
+				),
+		}	
+
+		err = json.NewEncoder(w).Encode(response)
+		if err != nil {
+			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		}
 	}
 }
 

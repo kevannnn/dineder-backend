@@ -59,6 +59,35 @@ func PostUser(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func UpdateUserProfilePic(w http.ResponseWriter, req *http.Request) {
+	UserID := chi.URLParam(req, "id")
+	var requestBody struct {
+		ImageUrl  string  `json:"image_url"`
+	}
+	
+	err := json.NewDecoder(req.Body).Decode(&requestBody) 
+	if err != nil {
+		http.Error(w, "Failed to decode request body", http.StatusBadRequest)
+		return
+	}
+	
+	updatedUser, err := dataaccess.UpdateUserField(database.DB, UserID, "ImageUrl", requestBody.ImageUrl)
+	if err != nil {
+		http.Error(w, "Failed to update user profile picture", http.StatusInternalServerError)
+		return
+	}
+
+	response := api.Response{
+		Data: json.RawMessage(
+			fmt.Sprintf(`{"message": "Updated profile picture for %s as %d"}`, updatedUser.Name, updatedUser.MealPref)),
+	}	
+
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
+}
+
 func UpdateUserGender(w http.ResponseWriter, req *http.Request) {
 	UserID := chi.URLParam(req, "id")
 	var requestBody struct {

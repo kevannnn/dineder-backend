@@ -19,7 +19,7 @@ func PostTimeslot(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	existingTS, err := dataaccess.GetTimeslotByTime(database.DB, newTS.Time)
+	existingTS:= dataaccess.GetTimeslotByTime(database.DB, newTS.Time)
 	if existingTS.ID != 0 {
 		TSExistResponse := api.Response{
 			Data: json.RawMessage(
@@ -29,7 +29,7 @@ func PostTimeslot(w http.ResponseWriter, req *http.Request) {
 					}`, existingTS.Time.String(), existingTS.ID),
 				),
 		}	
-		//w.WriteHeader(http.StatusOK)
+
 		err = json.NewEncoder(w).Encode(TSExistResponse)
 		if err != nil {
 			http.Error(w, "Failed to encode response", http.StatusInternalServerError)

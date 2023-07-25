@@ -15,6 +15,7 @@ type User struct {
 	PrefGender 	int 		`json:"pref_gender"`
 	Faculty 	int 		`json:"faculty"`
 	MealPref 	int 		`json:"meal_pref"`
+	ImageUrl	string		`json:"image_url"`
 }
 
 func (User) TableName() string {

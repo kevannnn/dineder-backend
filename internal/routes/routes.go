@@ -9,6 +9,7 @@ func GetRoutes() func(r chi.Router) {
 	return func(r chi.Router) {
 		r.Get("/user/{email}/{password}", handlers.GetUserID)
 		r.Post("/user", handlers.PostUser)
+		r.Patch("/user/{id}/imageUrl", handlers.UpdateUserProfilePic)
 		r.Patch("/user/{id}/gender", handlers.UpdateUserGender)
 		r.Patch("/user/{id}/prefGender", handlers.UpdateUserPrefGender)
 		r.Patch("/user/{id}/faculty", handlers.UpdateUserFaculty)

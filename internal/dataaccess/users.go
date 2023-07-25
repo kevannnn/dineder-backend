@@ -40,6 +40,16 @@ func GetUserNameFromID(db *gorm.DB, userID uuid.UUID) (string, error) {
 	return user.Name, result.Error
 }
 
+func GetUserFromID(db *gorm.DB, userID string) (models.User, error) {
+	var user models.User
+	result := db.First(&user, "id = ?", userID)
+	if result.Error != nil {
+		fmt.Println("Error fetching user: ", result.Error)
+	}
+	return user, result.Error
+}
+
+
 func UpdateUserGender(db *gorm.DB, userID string, userGender int) (models.User, error) {
 	var user models.User
 	userResult := db.Table("dineder_user").Where("id = ?", userID).First(&user)

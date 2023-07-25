@@ -26,12 +26,12 @@ func GetTSTimeFromID(db *gorm.DB, TSID uint) (string, error) {
 	return timeslot.Time.String(), result.Error
 }
 
-func GetTimeslotByTime(db *gorm.DB, timeTS time.Time) (models.Timeslot, error) {
+func GetTimeslotByTime(db *gorm.DB, timeTS time.Time) (models.Timeslot) {
 	var timeslot models.Timeslot
 	result := db.First(&timeslot, "time = ?", timeTS)
 	if result.Error != nil {
 		fmt.Println("Error fetching timeslot: ", result.Error)
 	}
-	return timeslot, result.Error
+	return timeslot
 
 }
